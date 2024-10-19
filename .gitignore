@@ -1,1 +1,28 @@
+.venv
+.vscode
+blog/migrations/*
+
+00*.py
+blog/__pycache__
+# Python cache files
+*.pyc
+__pycache__/
+
+# Environment variables file
 .env
+blog/__pycache__/urls.cpython-312.pyc
+# Database files
+db.sqlite3
+
+# Local settings
+local_settings.py  # if you have this file for local configurations
+
+# Other files to ignore
+*.log
+*.pot
+*.py[cod]
+.venv/  # if you're using a virtual environment in this folder
+
+migrations/
+
+run
