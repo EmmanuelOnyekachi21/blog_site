@@ -3,8 +3,9 @@ from .models import Post
 from django.http import Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
-from .forms import EmailPostForm
+from .forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail
+from django.views.decorators.http import require_POST
 
 # Create your views here.
 
@@ -53,7 +54,13 @@ def post_detail(request, year, month, day, post):
         publish__month=month,
         publish__day=day
     )
-    return render(request, 'blog/post/detail.html', {'post': post})
+    
+    # List of active comments for this post
+    comments = post.comments.filter(active=True)
+    # Form for the user to comment
+    form = CommentForm()
+
+    return render(request, 'blog/post/detail.html', {'post': post, 'comments': comments, 'form': form})
 
 def post_share(request, post_id):
     """View function for sharing a post.
@@ -93,3 +100,26 @@ def post_share(request, post_id):
     context = {'post': post, 'form': form, 'sent':sent}
 
     return render(request, 'blog/post/share.html', context)
+
+@require_POST
+def post_comment(request, post_id):
+    """
+    View to allow user to comment on a post
+    """
+    post = get_object_or_404(Post, id=post_id, status=Post.Status.PUBLISHED)
+    comment = None
+
+    # A comment was posted
+    form = CommentForm(data=request.POST)
+    
+    if form.is_valid():
+        comment = form.save(commit=False)
+        # Assign the post to the comment
+        comment.post = post
+        # Save comment to database
+        comment.save()
+        
+    context = {'post': post, 'form': form, 'comment': comment}
+
+    return render(request, 'blog/post/comment.html', context)
+    

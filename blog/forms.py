@@ -4,6 +4,8 @@ Creating forms with django
 
 from django import forms
 
+from .models import Comment
+
 class EmailPostForm(forms.Form):
     """Creating a form for user
 
@@ -17,3 +19,11 @@ class EmailPostForm(forms.Form):
         required=False,
         widget=forms.Textarea
     )
+
+class CommentForm(forms.ModelForm):
+    """
+    form to let users comment on blog posts
+    """
+    class Meta:
+        model = Comment
+        fields = ['name', 'email', 'body']
